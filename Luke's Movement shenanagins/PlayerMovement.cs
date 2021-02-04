@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
     //double jump
     public int counter = 1;
 
+    public KeyCode sprint;
+
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
@@ -49,6 +51,15 @@ public class PlayerMovement : MonoBehaviour
             counter = 1;
         }
 
+        if(Input.GetKeyDown(sprint))
+        {
+            speed = speed * 2;
+        }
+
+        if(Input.GetKeyUp(sprint))
+        {
+            speed = 12;
+        }
         velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
