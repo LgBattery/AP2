@@ -53,13 +53,14 @@ public class PlayerMovement : MonoBehaviour
 
         if(Input.GetKeyDown(sprint))
         {
-            speed = speed * 2;
+            speed = speed * 1.5f;
         }
 
         if(Input.GetKeyUp(sprint))
         {
             speed = 12;
         }
+        
         velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
