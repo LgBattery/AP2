@@ -26,7 +26,18 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        if (Physics.CheckSphere(groundCheck.position, groundDistance, groundMask))
+        {
+            isGrounded = true;
+            print("munayna");
+        }
+        
+        else
+        {
+            isGrounded = false;
+        }
+
+
 
         if(isGrounded && velocity.y < 0)
         {
