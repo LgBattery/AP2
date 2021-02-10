@@ -27,8 +27,8 @@ public class HealthBar : MonoBehaviour
         healthBar.value = Mathf.Lerp(healthBar.value, (float)part.health / (float)part.baseHealth, Time.deltaTime * 1);
 
         // Look twoards camera
-        transform.parent.transform.LookAt(Camera.main.transform.position);
-        transform.parent.transform.Rotate(0, 180, 0);
+        transform.LookAt(Camera.main.transform.position);
+        transform.Rotate(0, 180, 0);
         if (PlayerPrefs.GetInt("ShowHealthBars") == 0)
         {
             healthSlider.SetActive(false);

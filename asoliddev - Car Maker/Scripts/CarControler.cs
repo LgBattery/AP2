@@ -23,6 +23,7 @@ public class CarControler : MonoBehaviour
     public Transform engine;
     private Transform seat;
     private Transform playerTransform;
+    public float test;
 
     private void Start()
     {
@@ -170,6 +171,7 @@ public class CarControler : MonoBehaviour
                 ///apply motor torque
                 wheelAxle.wheelColliderLeft.motorTorque = motor;
                 wheelAxle.wheelColliderRight.motorTorque = motor;
+                test = motor;
             }
 
             ///apply motor break
