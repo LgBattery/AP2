@@ -46,6 +46,14 @@ public class PlayerMovementr : MonoBehaviour
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
 
+    //Teleport
+    public Transform cocaineCheck;
+    public float cocaineDistance = 0.4f;
+    public LayerMask cocaineMask;
+    public Transform teleportTarget;
+    public GameObject Player;
+    bool isOnCocaine;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -82,6 +90,22 @@ public class PlayerMovementr : MonoBehaviour
         if (jumpForce == 550f)
         {
             jumpForce = jumpForce / 2;
+        }
+
+        if (Physics.CheckSphere(cocaineCheck.position, cocaineDistance, cocaineMask))
+        {
+            isOnCocaine = true;
+            print("munayna");
+        }
+
+        else
+        {
+            isOnCocaine = false;
+        }
+
+        if (isOnCocaine)
+        {
+            Player.transform.position = teleportTarget.transform.position;
         }
     }
 

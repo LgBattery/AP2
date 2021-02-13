@@ -19,8 +19,15 @@ public class PlayerMovement : MonoBehaviour
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    public Transform cocaineCheck;
+    public float cocaineDistance = 0.4f;
+    public LayerMask cocaineMask;
+    public Transform teleportTarget;
+    public GameObject Player;
+
     Vector3 velocity;
     bool isGrounded;
+    bool isOnCocaine;
 
 
     // Update is called once per frame
@@ -37,9 +44,20 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = false;
         }
 
+        if (Physics.CheckSphere(cocaineCheck.position, cocaineDistance, cocaineMask))
+        {
+            isOnCocaine = true;
+            print("munayna");
+        }
+
+        else
+        {
+            isOnCocaine = false;
+        }
 
 
-        if(isGrounded && velocity.y < 0)
+
+        if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
@@ -76,6 +94,9 @@ public class PlayerMovement : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
-        
+        if(isOnCocaine)
+        {
+            Player.transform.position = teleportTarget.transform.position;
+        }
     }
 }
