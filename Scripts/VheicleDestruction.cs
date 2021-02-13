@@ -14,8 +14,9 @@ public class VheicleDestruction : MonoBehaviour
     public int untaggedPartHealth = 500;
 
     public bool testing = false;
-    // Display part names in healthbar
-    private bool displayPartNames;
+
+    // The minimum force required for a part to take damage
+    public float minDamageForce = 5f;
 
     public Transform[] wheels;
     public Transform mainBody;
@@ -28,6 +29,7 @@ public class VheicleDestruction : MonoBehaviour
 
     // The number divided by 10 is the % that health will be shown at for a part
     private int healthBarThreshold = 7;
+
 
     // Start is called before the first frame update
     void Start()
@@ -99,9 +101,10 @@ public class VheicleDestruction : MonoBehaviour
                 if (collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude != 0)
                 {
                     velocityDamage = collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude * velocityDamageMultipleier;
-                }
-                else
+                }             
+                else if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > minDamageForce)
                 {
+                    print(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
                     velocityDamage = gameObject.GetComponent<Rigidbody>().velocity.magnitude * velocityDamageMultipleier;
                 }
             }
@@ -112,6 +115,8 @@ public class VheicleDestruction : MonoBehaviour
         }
 
     }
+
+    
 
     // Arry for convinience, DO NOT USE IN UPDATE
     bool ArrayContains(Transform[] array, Transform g)

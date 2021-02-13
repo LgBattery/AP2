@@ -15,6 +15,8 @@ public class MenuScript : MonoBehaviour
     [SerializeField]
     private Toggle showVehiclePartNames;
     [SerializeField]
+    private Toggle rotateCameraWithVehicle;
+    [SerializeField]
     private Slider healthBarSize;
 
     // Toggles
@@ -33,6 +35,11 @@ public class MenuScript : MonoBehaviour
     private Transform controlsMenu;
     [SerializeField] private Vector3 controlMenuTo;
     [SerializeField] private Vector3 controlMenuStart;
+
+    [SerializeField]
+    private Transform gameMenu;
+    [SerializeField] private Vector3 gameMenuTo;
+    [SerializeField] private Vector3 gameMenuStart;
 
 
     // Start is called before the first frame update
@@ -68,6 +75,7 @@ public class MenuScript : MonoBehaviour
     {
         showVehicleHealthBars.isOn = PlayerPrefs.GetInt("ShowHealthBars") == 0 ? false : true;
         showVehiclePartNames.isOn = PlayerPrefs.GetInt("ShowHealthBarText") == 0 ? false : true;
+        rotateCameraWithVehicle.isOn = PlayerPrefs.GetInt("RotateCameraWithVehicle") == 0 ? false : true;
         healthBarSize.value = PlayerPrefs.GetFloat("HealthBarScale");
     }
     // This exists because when the values are being loaded this gets called making it so only the first value gets loaded, kinda unfortunate :( DO NOT REMOVE THE DELAY
@@ -78,23 +86,11 @@ public class MenuScript : MonoBehaviour
     void UIupdate()
     {
         // Toggle showing part health bars
-        if (showVehicleHealthBars.isOn)
-        {
-            PlayerPrefs.SetInt("ShowHealthBars", 1);
-        }
-        else
-        {
-            PlayerPrefs.SetInt("ShowHealthBars", 0);
-        }
+        PlayerPrefs.SetInt("ShowHealthBars", showVehicleHealthBars.isOn ? 1 : 0);
         // Toggle showing part names
-        if (showVehiclePartNames.isOn)
-        {
-            PlayerPrefs.SetInt("ShowHealthBarText", 1);
-        }
-        else
-        {
-            PlayerPrefs.SetInt("ShowHealthBarText", 0);
-        }
+        PlayerPrefs.SetInt("ShowHealthBarText", showVehiclePartNames.isOn ? 1 : 0);
+        // Toggle rotating camera with vheicle
+        PlayerPrefs.SetInt("RotateCameraWithVehicle", rotateCameraWithVehicle.isOn ? 1 : 0);
         // Set health bar size
         PlayerPrefs.SetFloat("HealthBarScale", healthBarSize.value);
     }
@@ -103,21 +99,39 @@ public class MenuScript : MonoBehaviour
         // Set visibility menu active or inactive and tween it into position
         if (visibilityMenu.gameObject.activeInHierarchy)
         {
-            LeanTween.moveLocal(visibilityMenu.gameObject, visibilityMenuStart, TweenTime).setOnComplete(setVisibilityMenuActive).setEase(TweenCurve);
+            LeanTween.moveLocal(visibilityMenu.gameObject, visibilityMenuStart, TweenTime).setOnComplete(SetVisibilityMenuActive).setEase(TweenCurve);
         }
         else
         {
-            setVisibilityMenuActive();
+            SetVisibilityMenuActive();
             LeanTween.moveLocal(visibilityMenu.gameObject, visibilityMenuTo, TweenTime).setEase(TweenCurve);
         }
         
+    }
+    public void OpenGameMenu()
+    {
+        // Set game menu active or inactive and tween it into position
+        if (gameMenu.gameObject.activeInHierarchy)
+        {
+            LeanTween.moveLocal(gameMenu.gameObject, gameMenuStart, TweenTime).setOnComplete(SetGameMenuActive).setEase(TweenCurve);
+        }
+        else
+        {
+            SetGameMenuActive();
+            LeanTween.moveLocal(gameMenu.gameObject, gameMenuTo, TweenTime).setEase(TweenCurve);
+        }
+
     }
     public void OpenControlMenu()
     {
 
     }
-    void setVisibilityMenuActive()
+    void SetVisibilityMenuActive()
     {
         visibilityMenu.gameObject.SetActive(visibilityMenu.gameObject.activeInHierarchy == true ? false : true);
+    }
+    void SetGameMenuActive()
+    {
+        gameMenu.gameObject.SetActive(gameMenu.gameObject.activeInHierarchy == true ? false : true);
     }
 }

@@ -9,6 +9,8 @@ public class CarControler : MonoBehaviour
 {
     [SerializeField]
     private bool inCar = false;
+    [SerializeField]
+    private Transform smoke;
     private bool inDriverSeat = false;
     public KeyCode exit;
     public List<WheelAxle> wheelAxleList;
@@ -24,6 +26,7 @@ public class CarControler : MonoBehaviour
     private Transform seat;
     private Transform playerTransform;
     public float test;
+    private bool broken = false;
 
     private void Start()
     {
@@ -67,6 +70,9 @@ public class CarControler : MonoBehaviour
         if (wheelMesh)
         {
             wheelMesh.transform.rotation = realRotation;
+
+            //Stop wheels from being inverted
+            wheelMesh.transform.Rotate(0, 180, 0);
         }
     }
 
@@ -90,16 +96,19 @@ public class CarControler : MonoBehaviour
             return;
         }
 
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+
         // Undo all of these when the player gets out
         player.transform.parent = seat;
-        player.GetComponent<Rigidbody>().isKinematic = true;
+        rb.isKinematic = true;
+        rb.interpolation = RigidbodyInterpolation.None;
         player.gameObject.layer = 6;
 
         inCar = true;
         playerTransform = player;
 
         // Get inside of the car and turn it on if in driver seat
-        LeanTween.moveLocal(player.gameObject, Vector3.zero, 1f);
+        player.localPosition = Vector3.zero;
         if (seat == seats[seats.Length - 1]) // If it is driver seat
         {
             controlActive = true;
@@ -109,15 +118,21 @@ public class CarControler : MonoBehaviour
 
     public void FixedUpdate()
     {
-        // If you are in car have option to get out
+        // Get out of car
         if (Input.GetKeyDown(exit) && inCar)
         {
             Vector3 exitPos = playerTransform.position;
 
+            Rigidbody rb = playerTransform.GetComponent<Rigidbody>();
+
+            //Restore player transform and controller settings
             playerTransform.transform.parent = null;
-            playerTransform.GetComponent<FirstPersonMovement>().enabled = true;
-            playerTransform.GetComponent<Rigidbody>().isKinematic = false;
+            playerTransform.GetComponent<PlayerMovementr>().enabled = true;
+            rb.isKinematic = false;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
             playerTransform.gameObject.layer = 0;
+            Vector3 v = playerTransform.localEulerAngles;
+            playerTransform.localEulerAngles = Vector3.zero;
 
             // Make sure player exits at point it started
             playerTransform.position = exitPos;
@@ -183,6 +198,10 @@ public class CarControler : MonoBehaviour
             ApplyWheelVisuals(wheelAxle.wheelColliderLeft, wheelAxle.wheelMeshLeft);
             ApplyWheelVisuals(wheelAxle.wheelColliderRight, wheelAxle.wheelMeshRight);
         }
-
+        if (broken == false && !engine)
+        {
+            broken = true;
+            Instantiate(smoke, transform);
+        }
     }
 }
