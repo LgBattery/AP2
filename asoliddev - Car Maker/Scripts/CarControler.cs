@@ -131,7 +131,6 @@ public class CarControler : MonoBehaviour
             rb.isKinematic = false;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             playerTransform.gameObject.layer = 0;
-            Vector3 v = playerTransform.localEulerAngles;
             playerTransform.localEulerAngles = Vector3.zero;
 
             // Make sure player exits at point it started
