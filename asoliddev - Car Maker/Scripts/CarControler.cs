@@ -119,7 +119,7 @@ public class CarControler : MonoBehaviour
     public void FixedUpdate()
     {
         // Get out of car
-        if (Input.GetKeyDown(exit) && inCar)
+        if (Input.GetKeyDown(exit) && inCar && playerTransform)
         {
             Vector3 exitPos = playerTransform.position;
 
@@ -135,7 +135,7 @@ public class CarControler : MonoBehaviour
 
             // Make sure player exits at point it started
             playerTransform.position = exitPos;
-
+            
             if (inDriverSeat)
             {
                 controlActive = false;

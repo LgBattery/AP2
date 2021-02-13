@@ -77,6 +77,10 @@ public class VheicleDestruction : MonoBehaviour
         if(!mainBody)
         {
             Destroy(parent.gameObject, 0);
+            foreach (Transform wheel in wheels)
+            {
+                Destroy(wheel, 0);
+            }
             GetComponent<CarControler>().enabled = false;
         }
     }
