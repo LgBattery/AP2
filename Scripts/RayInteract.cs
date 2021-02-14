@@ -8,6 +8,7 @@ public class RayInteract : MonoBehaviour
     private Transform cam;
     public float checkDistance;
     public KeyCode interact;
+    public Transform player;
 
     [HideInInspector]
     public string text;
@@ -33,12 +34,16 @@ public class RayInteract : MonoBehaviour
             if (hit.transform != null && Input.GetKeyDown(interact))
             {
                 hit.transform.GetComponent<RayInteractRecieve>().Interact();
+                if(player)
+                    hit.transform.GetComponent<RayInteractRecieve>().passTransform = player;
             }
 
             // If there is a possible interaction recieve possible interaction
             if (hit.transform != null)
             {
                 hit.transform.GetComponent<RayInteractRecieve>().Recieve(this);
+                if (player)
+                    hit.transform.GetComponent<RayInteractRecieve>().passTransform = player;
                 if (textObject)
                     textObject.text = text;
             }

@@ -27,6 +27,7 @@ public class CarControler : MonoBehaviour
     private Transform playerTransform;
     public float test;
     private bool broken = false;
+    public Transform player;
 
     private void Start()
     {
@@ -76,8 +77,16 @@ public class CarControler : MonoBehaviour
         }
     }
 
-    public void GetInCar(Transform player)
+    public void GetInCar()
     {
+        if (transform.GetComponent<RayInteractRecieve>())
+        {
+            player = transform.GetComponent<RayInteractRecieve>().passTransform;
+        }
+        else
+        {
+            print("THERE IS NOT RAY INTERACTRECIEVE SCRIPT ON " + gameObject.name);
+        }
         // Choose the closest seat to the max number of seats, the last seat in the array should always be the driver seat
         bool chairAvalible = false;
 
