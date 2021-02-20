@@ -119,6 +119,7 @@ public class CarControler : MonoBehaviour
         playerTransform = player;
 
         // Get inside of the car and turn it on if in driver seat
+        player.localEulerAngles = Vector3.zero;
         player.localPosition = Vector3.zero;
         if (seat == seats[seats.Length - 1]) // If it is driver seat
         {

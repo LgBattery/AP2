@@ -197,6 +197,8 @@ public class VheicleDestruction : MonoBehaviour
 
     void ExplodeCar()
     {
+        GetComponent<CarControler>().EvecuateCar();
+
         foreach (Part part in parts)
         {
             if (part.part)
@@ -255,6 +257,7 @@ public class VheicleDestruction : MonoBehaviour
 
             // Set the parts rigidbody and collider to active
             piece.GetComponent<Rigidbody>().isKinematic = false;
+            piece.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Continuous;
             piece.GetComponent<MeshCollider>().convex = true;
             piece.GetComponent<MeshCollider>().enabled = true;
         }
