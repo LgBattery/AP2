@@ -13,7 +13,9 @@ public class VheicleDestruction : MonoBehaviour
     public int baseHealth = 2500;
     public int untaggedPartHealth = 500;
 
+    // Test bools
     public bool testing = false;
+    public bool destroy = false;
 
     // The minimum force required for a part to take damage
     public float minDamageForce = 5f;
@@ -23,12 +25,18 @@ public class VheicleDestruction : MonoBehaviour
     // Use for destruction of entire car
     public Transform parent;
     public Transform healthBar;
+    public Transform explosionParticle;
+    public float explosionForce = 100f;
+    public float explosionRadius = 5f;
 
     public float velocityDamageMultipleier = 10f;
     public float vheicleHealth = 0f;
 
     // The number divided by 10 is the % that health will be shown at for a part
     private int healthBarThreshold = 7;
+
+    public bool destroyed = false;
+    public bool exploded = false;
 
 
     // Start is called before the first frame update
@@ -74,14 +82,14 @@ public class VheicleDestruction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!mainBody)
+        if (!mainBody && !destroyed)
         {
-            Destroy(parent.gameObject, 0);
-            foreach (Transform wheel in wheels)
-            {
-                Destroy(wheel, 0);
-            }
-            GetComponent<CarControler>().enabled = false;
+            DestroyCar();
+        }
+        if (destroy)
+        {
+            Destroy(mainBody.gameObject, 0);
+            destroy = false;
         }
     }
 
@@ -105,22 +113,20 @@ public class VheicleDestruction : MonoBehaviour
                 if (collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude != 0)
                 {
                     velocityDamage = collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude * velocityDamageMultipleier;
-                }             
-                else if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > minDamageForce)
+                }
+                else if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > minDamageForce)
                 {
                     print(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
                     velocityDamage = gameObject.GetComponent<Rigidbody>().velocity.magnitude * velocityDamageMultipleier;
                 }
             }
-                
-            DoDamage(parts[partIndex].part, (int) velocityDamage);
+
+            DoDamage(parts[partIndex].part, (int)velocityDamage);
 
             print(parts[partIndex].health);
         }
 
     }
-
-    
 
     // Arry for convinience, DO NOT USE IN UPDATE
     bool ArrayContains(Transform[] array, Transform g)
@@ -155,7 +161,7 @@ public class VheicleDestruction : MonoBehaviour
         }
 
         // Check if the part is below the health threshold to show healthbars
-        if ((float)parts[partIndex].health / (float)parts[partIndex].baseHealth < (float) healthBarThreshold / (float) 10 &&
+        if ((float)parts[partIndex].health / (float)parts[partIndex].baseHealth < (float)healthBarThreshold / (float)10 &&
             (parts[partIndex].healthBar == false))
         {
             Transform hb = Instantiate(healthBar, parts[partIndex].part);
@@ -171,6 +177,87 @@ public class VheicleDestruction : MonoBehaviour
         }
 
         vheicleHealth = healthCounter;
+
+    }
+
+    void DestroyCar()
+    {
+        if (!destroyed)
+        {
+            Instantiate(GetComponent<CarControler>().smoke, transform);
+            Instantiate(GetComponent<CarControler>().smoke, transform);
+            Invoke("ExplodeCar", 5f);
+
+            destroyed = true;
+
+            //Force player out of car so they dont get destroyed
+            GetComponent<CarControler>().EvecuateCar();
+        }
+    }
+
+    void ExplodeCar()
+    {
+        foreach (Part part in parts)
+        {
+            if (part.part)
+            {
+                // Unparent and put physics on part
+                EnablePhysics(part.part);
+
+                // Shoot part out
+                part.part.GetComponent<Rigidbody>().AddForce(Vector3.up * explosionForce);
+
+                // Break every part in vehicle
+                DoDamage(part.part, 999999999);
+            }
+        }
+        exploded = true;
+
+        // Add explosion effect
+        Instantiate(explosionParticle, transform);
+
+        // Add an explosion force
+        Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
+        foreach(Collider collider in colliders)
+        {
+            if(collider.GetComponent<Rigidbody>())
+                collider.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRadius);
+        }
+    }
+
+    void EnablePhysics(Transform piece)
+    {
+        // Get index to see if part already has physics enabled
+        int partIndex = parts.FindIndex(a => a.part == piece);
+
+        if (piece && !parts[partIndex].physics)
+        {
+            // Detatch part from vheicle
+            Vector3 partPostition = piece.position;
+            Quaternion partRotation = piece.rotation;
+
+            piece.parent = null;
+
+            piece.position = partPostition;
+            piece.rotation = partRotation;
+
+            // If there is no rigidbody, add one
+            if (piece.GetComponent<Rigidbody>() == null)
+            {
+                piece.gameObject.AddComponent<Rigidbody>();
+            }
+
+            // If there is no meshCollider, add one
+            if (piece.GetComponent<MeshCollider>() == null)
+            {
+                piece.gameObject.AddComponent<MeshCollider>();
+            }
+
+            // Set the parts rigidbody and collider to active
+            piece.GetComponent<Rigidbody>().isKinematic = false;
+            piece.GetComponent<MeshCollider>().convex = true;
+            piece.GetComponent<MeshCollider>().enabled = true;
+        }
     }
 
     void BreakPart(int partIndex)
@@ -179,27 +266,17 @@ public class VheicleDestruction : MonoBehaviour
         parts[partIndex].dead = true;
         print(parts[partIndex].part + " has been broken!");
 
-        // Detatch part from vheicle
-        Vector3 partPostition = parts[partIndex].part.position;
-        Quaternion partRotation = parts[partIndex].part.rotation;
-
-        parts[partIndex].part.parent = null;
-
-        parts[partIndex].part.position = partPostition;
-        parts[partIndex].part.rotation = partRotation;
-
-        // If there is no rigidbody, add one
-        if (parts[partIndex].part.GetComponent<Rigidbody>() == null)
+        // If the part is the main body destroy car instead
+        if (parts[partIndex].part == mainBody)
         {
-            parts[partIndex].part.gameObject.AddComponent<Rigidbody>();
+            DestroyCar();
+            return;
         }
-
-        // Set the parts rigidbody and collider to active
-        parts[partIndex].part.GetComponent<Rigidbody>().isKinematic = false;
-        parts[partIndex].part.GetComponent<MeshCollider>().enabled = true;
+        // Turn on physics
+        EnablePhysics(parts[partIndex].part);
 
         // CHANGE TIME TO SOMETHING CHANGEABLE LATER
-        Destroy(parts[partIndex].part.gameObject, 10);
+        Destroy(parts[partIndex].part.gameObject, 10f + Random.Range(0f, 3f));
     }
 }
 
@@ -209,6 +286,7 @@ public class Part
     public Transform part;
     public int health;
     public bool dead;
+    public bool physics;
     public int baseHealth;
     public bool healthBar;
 
@@ -218,6 +296,7 @@ public class Part
         part = part_;
         health = health_;
         dead = dead_;
+        physics = false;
         healthBar = false;
     }
 }

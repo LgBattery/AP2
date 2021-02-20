@@ -18,7 +18,14 @@ public class HealthBar : MonoBehaviour
         healthBar = healthSlider.GetComponent<Slider>();
         partTransform = part.part;
         transform.GetComponent<Canvas>().worldCamera = GameObject.FindGameObjectWithTag("UICamera").GetComponent<Camera>();
-        text.text = partTransform.name;
+        if (partTransform)
+        {
+            text.text = partTransform.name;
+        }
+        else
+        {
+            text.text = "";
+        }
     }
 
     // Update is called once per frame
