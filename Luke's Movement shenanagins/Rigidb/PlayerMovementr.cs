@@ -19,7 +19,9 @@ public class PlayerMovementr : MonoBehaviour
 
     //Movement
     public float moveSpeed = 4500;
-    public float maxSpeed = 20;
+    public float maxSpeed = 7;
+    public float sprintSpeed = 12;
+    private float ogSpeed;
     public bool grounded;
     public LayerMask whatIsGround;
 
@@ -61,6 +63,7 @@ public class PlayerMovementr : MonoBehaviour
 
     void Start()
     {
+        ogSpeed = maxSpeed;
         playerScale = transform.localScale;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -77,14 +80,13 @@ public class PlayerMovementr : MonoBehaviour
         MyInput();
         Look();
 
-        if (Input.GetKeyDown(sprint))
+        if (Input.GetKey(sprint))
         {
-            maxSpeed = maxSpeed * 1.5f;
+            maxSpeed = sprintSpeed;
         }
-
-        if (Input.GetKeyUp(sprint))
+        else
         {
-            maxSpeed = 20;
+            maxSpeed = ogSpeed;
         }
 
         if (jumpForce == 550f)
