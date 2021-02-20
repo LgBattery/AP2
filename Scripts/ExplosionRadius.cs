@@ -10,7 +10,11 @@ public class ExplosionRadius : MonoBehaviour
     [SerializeField]
     private float damage = 5f;
     [SerializeField]
+    private float damageFallOff = 5f;
+    [SerializeField]
     private LayerMask mask;
+    [SerializeField]
+    private Transform explosionEffect;
 
     void Start()
     {
@@ -40,11 +44,14 @@ public class ExplosionRadius : MonoBehaviour
                 //if it the part is a part of the vheicle damage the part
                 if (collider.GetComponentInParent<VheicleDestruction>() == vheicle)
                 {
-                    int damage_ = (int)(Vector3.Distance(transform.position, collider.transform.position) * damage);
+                    int damage_ = (int) (damage / (Vector3.Distance(transform.position, collider.transform.position) * damageFallOff));
                     print("did " + damage_ + " Damage to " + collider.name);
                     vheicle.DoDamage(collider.transform, damage_);
                 }
             }
         }
+        // Play explosion particle effect if one is present
+        if(explosionEffect)
+            Instantiate(explosionEffect, transform);
     }
 }
