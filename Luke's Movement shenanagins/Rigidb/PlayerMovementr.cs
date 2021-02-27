@@ -1,7 +1,8 @@
 ﻿using System;
 using UnityEngine;
+using Mirror;
 
-public class PlayerMovementr : MonoBehaviour
+public class PlayerMovementr : NetworkBehaviour
 {
     public KeyCode sprint;
 
@@ -63,6 +64,11 @@ public class PlayerMovementr : MonoBehaviour
 
     void Start()
     {
+        if(isLocalPlayer)
+            gameObject.name = "LocalPlayer";
+
+        playerCam = GameObject.Find("Camera").transform;
+        
         ogSpeed = maxSpeed;
         playerScale = transform.localScale;
         Cursor.lockState = CursorLockMode.Locked;
@@ -77,37 +83,40 @@ public class PlayerMovementr : MonoBehaviour
 
     private void Update()
     {
-        MyInput();
-        Look();
+        if (isLocalPlayer)
+        {
+            MyInput();
+            Look();
 
-        if (Input.GetKey(sprint))
-        {
-            maxSpeed = sprintSpeed;
-        }
-        else
-        {
-            maxSpeed = ogSpeed;
-        }
+            if (Input.GetKey(sprint))
+            {
+                maxSpeed = sprintSpeed;
+            }
+            else
+            {
+                maxSpeed = ogSpeed;
+            }
 
-        if (jumpForce == 550f)
-        {
-            jumpForce = jumpForce / 2;
-        }
+            if (jumpForce == 550f)
+            {
+                jumpForce = jumpForce / 2;
+            }
 
-        if (Physics.CheckSphere(cocaineCheck.position, cocaineDistance, cocaineMask))
-        {
-            isOnCocaine = true;
-            print("munayna");
-        }
+            //if (Physics.CheckSphere(cocaineCheck.position, cocaineDistance, cocaineMask))
+            //{
+            //    isOnCocaine = true;
+            //    print("munayna");
+            //}
 
-        else
-        {
-            isOnCocaine = false;
-        }
+            //else
+            //{
+            //    isOnCocaine = false;
+            //}
 
-        if (isOnCocaine)
-        {
-            Player.transform.position = teleportTarget.transform.position;
+            //if (isOnCocaine)
+            //{
+            //    Player.transform.position = teleportTarget.transform.position;
+            //}
         }
     }
 
